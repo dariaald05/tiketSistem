@@ -2,7 +2,7 @@
 // Configuración de base de datos
 $db_host = "localhost";
 $db_user = "appuser";  // CAMBIA ESTO
-$db_password = "123456"; // CAMBIA ESTO
+$db_password = "GatitoServer.2025!"; // CAMBIA ESTO
 $db_name = "sistematickets"; // CAMBIA ESTO SI ES DIFERENTE
 
 // Conexión
