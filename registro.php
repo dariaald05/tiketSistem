@@ -98,10 +98,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - Sistema Tickets</title>
     <style>
-        /* ESTILO MORADO */
+        /* ESTILO MORADO CLARO */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #2e003e 0%, #6a0dad 100%);
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -113,14 +113,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-color: #ffffff;
             padding: 40px;
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
         }
 
         h2 {
             text-align: center;
-            color: #4b0082; /* Indigo oscuro */
+            color: #9c27b0; /* Morado medio */
             margin-bottom: 30px;
         }
 
@@ -131,7 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
+            color: #7b1fa2; /* Morado oscuro */
             font-weight: 600;
         }
 
@@ -142,19 +142,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             padding: 12px;
             border: 2px solid #e1bee7; /* Morado muy claro */
             border-radius: 6px;
-            box-sizing: border-box; /* Para que el padding no rompa el ancho */
+            box-sizing: border-box;
             transition: border-color 0.3s;
         }
 
         input:focus {
             outline: none;
-            border-color: #8e44ad;
+            border-color: #ba68c8; /* Morado claro */
         }
 
         button {
             width: 100%;
             padding: 12px;
-            background-color: #8e44ad; /* Morado vibrante */
+            background-color: #ba68c8; /* Morado claro */
             color: white;
             border: none;
             border-radius: 6px;
@@ -165,7 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         button:hover {
-            background-color: #6c3483; /* Morado más oscuro al pasar el mouse */
+            background-color: #9c27b0; /* Morado medio */
         }
 
         .alert {
@@ -194,7 +194,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         
         .login-link a {
-            color: #8e44ad;
+            color: #ba68c8;
             text-decoration: none;
             font-weight: bold;
         }
