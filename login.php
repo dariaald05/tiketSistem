@@ -1,64 +1,50 @@
 <?php
-require_once "config.php";
+require_once 'config.php';
+session_start();
 
-/*
- |-------------------------------------------------
- | Si ya está logueado, redirigir
- |-------------------------------------------------
- */
-if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-    header("Location: tickets.php");
+// Si ya está logueado, enviar al index
+if (isset($_SESSION['usuario_id'])) {
+    header("Location: index.php");
     exit;
 }
 
 $error = "";
 
-/*
- |-------------------------------------------------
- | Procesar login
- |-------------------------------------------------
- */
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST["email"] ?? "");
     $password = $_POST["password"] ?? "";
 
     if (empty($email) || empty($password)) {
-        $error = "Todos los campos son obligatorios.";
+        $error = "Por favor ingresa correo y contraseña.";
     } else {
-
-        $sql = "SELECT id, nombre, password FROM usuarios WHERE email = ?";
-        $stmt = $conexion->prepare($sql);
-
-        if (!$stmt) {
-            $error = "Error del sistema.";
-        } else {
+        $sql = "SELECT id, nombre, password, rol FROM usuarios WHERE email = ?";
+        if ($stmt = $conexion->prepare($sql)) {
             $stmt->bind_param("s", $email);
             $stmt->execute();
-            $resultado = $stmt->get_result();
-
-            if ($resultado->num_rows === 1) {
-                $usuario = $resultado->fetch_assoc();
-
-                if (password_verify($password, $usuario["password"])) {
-
-                    // Crear sesión
-                    $_SESSION["loggedin"] = true;
-                    $_SESSION["id"] = $usuario["id"];
-                    $_SESSION["nombre"] = $usuario["nombre"];
-
-                    header("Location: tickets.php");
+            $stmt->store_result();
+            
+            if ($stmt->num_rows == 1) {
+                $stmt->bind_result($id, $nombre, $hashed_password, $rol);
+                $stmt->fetch();
+                
+                // Verificar contraseña
+                if (password_verify($password, $hashed_password)) {
+                    // ¡Login Exitoso! Guardamos datos en sesión
+                    $_SESSION['usuario_id'] = $id;
+                    $_SESSION['usuario'] = $nombre; // Usado por obtener_usuario_actual
+                    $_SESSION['rol'] = $rol;
+                    
+                    header("Location: index.php");
                     exit;
-
                 } else {
-                    $error = "Contraseña incorrecta.";
+                    $error = "La contraseña es incorrecta.";
                 }
-
             } else {
-                $error = "El usuario no existe.";
+                $error = "No existe una cuenta con ese correo.";
             }
-
             $stmt->close();
+        } else {
+            $error = "Error del sistema.";
         }
     }
 }
@@ -67,127 +53,32 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Iniciar Sesión - Sistema de Tickets</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <title>Login - Sistema Tickets</title>
     <style>
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #ede9fe, #ddd6fe, #c4b5fd);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-        }
-
-        .login-card {
-            background: #ffffff;
-            width: 100%;
-            max-width: 420px;
-            padding: 2.5rem;
-            border-radius: 18px;
-            box-shadow: 0 20px 40px rgba(94, 53, 177, 0.25);
-            animation: fadeIn 0.8s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h2 {
-            text-align: center;
-            color: #5E35B1;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 6px;
-            color: #5E35B1;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #c4b5fd;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            border-radius: 10px;
-            border: none;
-            background: linear-gradient(135deg, #7c3aed, #5E35B1);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background: #4527a0;
-            transform: translateY(-2px);
-        }
-
-        .error {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .extra {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 0.9em;
-        }
-
-        .extra a {
-            color: #5E35B1;
-            text-decoration: none;
-            font-weight: bold;
-        }
+        body { font-family: sans-serif; background: linear-gradient(135deg, #2e003e 0%, #6a0dad 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: #333; }
+        .container { background: #fff; padding: 40px; border-radius: 10px; width: 100%; max-width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        h2 { text-align: center; color: #4b0082; margin-top: 0; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #8e44ad; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #732d91; }
+        .alert { background: #fce4ec; color: #c2185b; padding: 10px; margin-bottom: 15px; border-radius: 5px; font-size: 14px; text-align: center; border: 1px solid #f8bbd0; }
+        a { color: #8e44ad; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h2>Iniciar Sesión</h2>
+        <?php if ($error): ?>
+            <div class="alert"><?php echo $error; ?></div>
+        <?php endif; ?>
 
-<div class="login-card">
-    <h2>🔐 Iniciar Sesión</h2>
-
-    <?php if ($error): ?>
-        <div class="error"><?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
-
-    <form method="POST">
-        <div class="form-group">
-            <label>Correo electrónico</label>
-            <input type="email" name="email" required>
-        </div>
-
-        <div class="form-group">
-            <label>Contraseña</label>
-            <input type="password" name="password" required>
-        </div>
-
-        <input type="submit" value="Entrar" class="btn-primary">
-    </form>
-
-    <div class="extra">
-        ¿No tienes cuenta?
-        <a href="registro.php">Regístrate</a>
+        <form method="POST">
+            <input type="email" name="email" placeholder="Correo electrónico" required>
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <button type="submit">Entrar</button>
+        </form>
+        <p style="text-align:center; font-size:14px; margin-top: 20px;">¿No tienes cuenta? <a href="registro.php">Regístrate</a></p>
     </div>
-</div>
-
 </body>
 </html>
