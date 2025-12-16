@@ -125,7 +125,7 @@ function is_logged_in() {
 /**
  * Función para obtener datos del usuario actual
  */
-function get_current_user() {
+function get_current_user_sistema() {
     if (is_logged_in()) {
         return [
             'id' => $_SESSION["id"],
